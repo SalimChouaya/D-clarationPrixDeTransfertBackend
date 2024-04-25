@@ -1,0 +1,19 @@
+package com.PrixDeTransfert.Backend.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.PrixDeTransfert.Backend.models.LigneOperationsAccordsPrealablesOuRescritsFiscauxBD;
+@RestController
+public class ControllerLigneOperationsAccordsPrealablesOuRescritsFiscaux {
+	@Autowired
+	private com.PrixDeTransfert.Backend.services.ServiceLigneOperationsAccordsPrealablesOuRescritsFiscaux ServiceLigneOperationsAccordsPrealablesOuRescritsFiscaux ;
+	
+	@PostMapping("/DéclarationPrixDeTransfert/InformationsOperations/InformationsOperationsAccordsPrealablesOuRescritsFiscaux/LigneOperationsAccordsPrealablesOuRescritsFiscaux/{idInformationsOperationsAccordsPrealablesOuRescritsFiscaux}")
+	public LigneOperationsAccordsPrealablesOuRescritsFiscauxBD save(@RequestBody LigneOperationsAccordsPrealablesOuRescritsFiscauxBD  a,@PathVariable("idInformationsOperationsAccordsPrealablesOuRescritsFiscaux") Long idInformationsOperationsAccordsPrealablesOuRescritsFiscaux) {
+		return ServiceLigneOperationsAccordsPrealablesOuRescritsFiscaux.save(a, idInformationsOperationsAccordsPrealablesOuRescritsFiscaux);}
+
+}

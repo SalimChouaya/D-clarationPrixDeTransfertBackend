@@ -1,0 +1,20 @@
+package com.PrixDeTransfert.Backend.controllers;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.PrixDeTransfert.Backend.models.InformationsSurContrepartieNonMonetairePourBiensOuServicesBD;
+
+@RestController
+public class ControllerInformationsSurContrepartieNonMonetairePourBiensOuServices {
+	@Autowired
+	com.PrixDeTransfert.Backend.services.ServiceInformationsSurContrepartieNonMonetairePourBiensOuServices ServiceInformationsSurContrepartieNonMonetairePourBiensOuServices;
+	
+	@PostMapping("/DéclarationPrixDeTransfert/InformationsOperations/OperationsSansContrepartieOuAvecContrepartieNonMonetaire/InformationsSurContrepartieNonMonetairePourBiensOuServices/{IdOperationsSansContrepartieOuAvecContrepartieNonMonetaire}")
+	public InformationsSurContrepartieNonMonetairePourBiensOuServicesBD save(@RequestBody InformationsSurContrepartieNonMonetairePourBiensOuServicesBD  a,@PathVariable("IdOperationsSansContrepartieOuAvecContrepartieNonMonetaire") Long IdOperationsSansContrepartieOuAvecContrepartieNonMonetaire) {
+		return ServiceInformationsSurContrepartieNonMonetairePourBiensOuServices.save(a, IdOperationsSansContrepartieOuAvecContrepartieNonMonetaire);}
+
+}

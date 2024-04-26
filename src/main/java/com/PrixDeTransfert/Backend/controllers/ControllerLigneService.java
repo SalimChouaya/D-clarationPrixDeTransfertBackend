@@ -9,13 +9,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.PrixDeTransfert.Backend.models.LigneServiceBD;
 import com.PrixDeTransfert.Backend.services.ServiceLigneService;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 public class ControllerLigneService {
 	@Autowired
 	private ServiceLigneService LigneService ;
 	
-	@PostMapping("/DéclarationPrixDeTransfert/MontantTransaction/InformationsServices/LigneService/{idInformationsService}")
-	public LigneServiceBD  save(@RequestBody LigneServiceBD  a,@PathVariable("idInformationsService") Long idInformationsService) {
+	@PostMapping("/DéclarationPrixDeTransfert/MontantTransaction/InformationsServices/LigneService")
+	public LigneServiceBD  save(@RequestBody LigneServiceBD  a,HttpSession session) {
+		Long idInformationsService=(Long) session.getAttribute("idInformationsServices");
 		return LigneService.save(a, idInformationsService);}
 
 }

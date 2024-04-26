@@ -7,12 +7,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.PrixDeTransfert.Backend.models.LigneActifCorporelBD;
+
+import jakarta.servlet.http.HttpSession;
 @RestController
 public class ControlleurLigneActifCorporel {
 	@Autowired
 	private com.PrixDeTransfert.Backend.services.ServiceLigneActifCorporel ServiceLigneActifCorporel ;
 	
-	@PostMapping("/DéclarationPrixDeTransfert/InformationsGroupesEntreprises/ActifCorporel/{InformationsGroupeEntreprises-id}")
-	public LigneActifCorporelBD save(@RequestBody LigneActifCorporelBD  a,@PathVariable("InformationsGroupeEntreprises-id") Long InformationsGroupeEntreprisesid) {
-		return ServiceLigneActifCorporel.save(a, InformationsGroupeEntreprisesid);
+	@PostMapping("/DéclarationPrixDeTransfert/InformationsGroupesEntreprises/ActifCorporel")
+	public LigneActifCorporelBD save(@RequestBody LigneActifCorporelBD  a,HttpSession session) {
+		Long idInformationsGroupeEntreprises=(Long) session.getAttribute("idInformationsGroupeEntreprises");
+		return ServiceLigneActifCorporel.save(a, idInformationsGroupeEntreprises);
 }}

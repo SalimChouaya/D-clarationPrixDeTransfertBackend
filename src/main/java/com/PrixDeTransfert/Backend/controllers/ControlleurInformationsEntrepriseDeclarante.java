@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.PrixDeTransfert.Backend.models.ChangementsActiviteAucoursExerciceBD;
 import com.PrixDeTransfert.Backend.models.InformationsEntrepriseDeclaranteBD;
+import com.PrixDeTransfert.Backend.models.ModificationLiensCapitalAuCoursExerciceBD;
 import com.PrixDeTransfert.Backend.models.Qualité;
+
+import jakarta.servlet.http.HttpSession;
 @RestController
 public class ControlleurInformationsEntrepriseDeclarante {
 	
@@ -16,27 +19,41 @@ public class ControlleurInformationsEntrepriseDeclarante {
 		@Autowired
 		private com.PrixDeTransfert.Backend.services.ServiceInformationsEntrepriseDeclarante ServiceInformationsEntrepriseDeclarante;
 		
-		@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/{DéclarationPrixDeTransfert-id}")
-		public InformationsEntrepriseDeclaranteBD save(@RequestBody InformationsEntrepriseDeclaranteBD  a,@PathVariable("DéclarationPrixDeTransfert-id") Long idDéclaration) {
-			return ServiceInformationsEntrepriseDeclarante.save(a, idDéclaration);
+		@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante")
+		public InformationsEntrepriseDeclaranteBD save(@RequestBody InformationsEntrepriseDeclaranteBD  a,HttpSession session) {
+			Long declarationid =(Long) session.getAttribute("Déclarationid");
+			InformationsEntrepriseDeclaranteBD InformationsEntrepriseDeclaranteBD=ServiceInformationsEntrepriseDeclarante.save(a, declarationid);
+			session.setAttribute("InformationsEntrepriseDeclaranteid",InformationsEntrepriseDeclaranteBD.getId() );
+			return InformationsEntrepriseDeclaranteBD ;
 			
 		}
 		
 		@Autowired
 		private com.PrixDeTransfert.Backend.services.ServiceQualité ServiceQualité;
-		@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/qualité/{InformationsEntrepriseDeclarante-id}")
-		public Qualité save(@RequestBody Qualité  a,@PathVariable("InformationsEntrepriseDeclarante-id") Long InformationsEntrepriseDeclaranteid) {
+		@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/qualité")
+		public Qualité save(@RequestBody Qualité  a,HttpSession session) {
+			Long InformationsEntrepriseDeclaranteid=(Long) session.getAttribute("InformationsEntrepriseDeclaranteid");
+			
 			return ServiceQualité.save(a, InformationsEntrepriseDeclaranteid);
 			
 		}
 		@Autowired
 		private com.PrixDeTransfert.Backend.services.ServiceChangementsActiviteAucoursExercice ServiceChangementsActiviteAucoursExercice;
 		
-		@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/ChangementsActiviteAucoursExercice/{InformationsEntrepriseDeclarante-id}")
-		public ChangementsActiviteAucoursExerciceBD save(@RequestBody ChangementsActiviteAucoursExerciceBD  a,@PathVariable("InformationsEntrepriseDeclarante-id") Long InformationsEntrepriseDeclaranteid) {
+		@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/ChangementsActiviteAucoursExercice")
+		public ChangementsActiviteAucoursExerciceBD save(@RequestBody ChangementsActiviteAucoursExerciceBD  a,HttpSession session) {
+			Long InformationsEntrepriseDeclaranteid=(Long) session.getAttribute("InformationsEntrepriseDeclaranteid");
 			return ServiceChangementsActiviteAucoursExercice.save(a, InformationsEntrepriseDeclaranteid);
 		
 		}
 		
+		@Autowired
+		private com.PrixDeTransfert.Backend.services.ServiceModificationLiensCapitalAuCoursExercice ServiceModificationLiensCapitalAuCoursExercice;
 		
+		@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/ModificationLiensCapitalAuCoursExercice")
+		public ModificationLiensCapitalAuCoursExerciceBD save(@RequestBody ModificationLiensCapitalAuCoursExerciceBD  a,HttpSession session) {
+			Long InformationsEntrepriseDeclaranteid=(Long) session.getAttribute("InformationsEntrepriseDeclaranteid");
+			return ServiceModificationLiensCapitalAuCoursExercice.save(a, InformationsEntrepriseDeclaranteid);
+		
+		}
 }

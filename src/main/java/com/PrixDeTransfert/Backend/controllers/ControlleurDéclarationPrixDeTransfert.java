@@ -10,15 +10,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.PrixDeTransfert.Backend.models.DéclarationPrixDeTransfert;
 
+import jakarta.servlet.http.HttpSession;
+
 
 @RestController
 public class ControlleurDéclarationPrixDeTransfert {
 	@Autowired
 	private com.PrixDeTransfert.Backend.services.ServiceDéclarationPrixDeTransfert ServiceDéclarationPrixDeTransfert;
 	
-	@PostMapping("/DéclarationPrixDeTransfert/{Entreprise-id}")
-	public DéclarationPrixDeTransfert save(@RequestBody DéclarationPrixDeTransfert a,@PathVariable("Entreprise-id") Long entrepriseid) {
-		return ServiceDéclarationPrixDeTransfert.save(a,entrepriseid);
+	@PostMapping("/DéclarationPrixDeTransfert")
+	public DéclarationPrixDeTransfert save(@RequestBody DéclarationPrixDeTransfert a,HttpSession session) {
+		Long entrepriseid=(Long) session.getAttribute("entrepriseId");
+		DéclarationPrixDeTransfert Declaration =ServiceDéclarationPrixDeTransfert.save(a,entrepriseid);
+		session.setAttribute("Déclarationid", Declaration.getId());
+		return Declaration;
 		
 	}
 	

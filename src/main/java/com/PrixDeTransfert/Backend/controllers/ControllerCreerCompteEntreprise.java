@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.PrixDeTransfert.Backend.models.*;
 
+import jakarta.servlet.http.HttpSession;
+
 
 @RestController
 public class ControllerCreerCompteEntreprise {
@@ -15,8 +17,10 @@ public class ControllerCreerCompteEntreprise {
 	private com.PrixDeTransfert.Backend.services.ServiceCreerCompte ServiceCreerCompte;
 	
 	@PostMapping("/Entreprise")
-	public com.PrixDeTransfert.Backend.models.Entreprise save(@RequestBody com.PrixDeTransfert.Backend.models.Entreprise a) {
-		return ServiceCreerCompte.save(a);
+	public com.PrixDeTransfert.Backend.models.Entreprise save(@RequestBody com.PrixDeTransfert.Backend.models.Entreprise a, HttpSession session) {
+		Entreprise savedEntreprise = ServiceCreerCompte.save(a);
+        session.setAttribute("entrepriseId", savedEntreprise.getId());
+		return savedEntreprise;
 		
 	}
 	@GetMapping("/Entreprise/{id}")

@@ -7,12 +7,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.PrixDeTransfert.Backend.models.InformationsServicesBD;
+
+import jakarta.servlet.http.HttpSession;
 @RestController
 public class ControllerInformationsServices {
 	@Autowired
 	private com.PrixDeTransfert.Backend.services.ServiceInformationsServices ServiceInformationsServices  ;
 	
-	@PostMapping("/DéclarationPrixDeTransfert/MontantTransaction/InformationsServices/{idMontantTransaction}")// lid nekhdho m return mta InformationsValeursExploitation.save(a, idDéclaration)(khatr montantTransaction o informationsOperations yetsan3o mara kahw
-	public InformationsServicesBD save(@RequestBody InformationsServicesBD  a,@PathVariable("idMontantTransaction") Long idMontantTransaction) {
-		return ServiceInformationsServices.save(a, idMontantTransaction);}
+	@PostMapping("/DéclarationPrixDeTransfert/MontantTransaction/InformationsServices")// lid nekhdho m return mta InformationsValeursExploitation.save(a, idDéclaration)(khatr montantTransaction o informationsOperations yetsan3o mara kahw
+	public InformationsServicesBD save(@RequestBody InformationsServicesBD  a,HttpSession session) {
+		Long idMontantTransaction =(Long) session.getAttribute("idMontantTransactions");
+		InformationsServicesBD informationsServicesBD=ServiceInformationsServices.save(a, idMontantTransaction);
+		session.setAttribute("idInformationsServices", informationsServicesBD.getId());
+		return informationsServicesBD;}
 }

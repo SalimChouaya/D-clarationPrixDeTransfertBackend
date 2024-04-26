@@ -8,14 +8,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.PrixDeTransfert.Backend.models.LignePretAccordeBD;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 public class ControllerLignePretAccorde {
 	@Autowired
 	private com.PrixDeTransfert.Backend.services.ServiceLignePretAccorde ServiceLignePretAccorde;
 	
-	@PostMapping("/DéclarationPrixDeTransfert/InformationsOperations/InformationsPretsEmprunts/LignePretAccorde/{idInformationsOperations}")// lid nekhdhouh waktli nasn3o awel mara InformationsOperations f valeur Exploitation 
-	public LignePretAccordeBD save(@RequestBody LignePretAccordeBD  a,@PathVariable("idInformationsOperations") Long idInformationsOperations) {
-		return ServiceLignePretAccorde.save(a, idInformationsOperations);}
+	@PostMapping("/DéclarationPrixDeTransfert/InformationsOperations/InformationsPretsEmprunts/LignePretAccorde")// lid nekhdhouh waktli nasn3o awel mara InformationsOperations f valeur Exploitation 
+	public LignePretAccordeBD save(@RequestBody LignePretAccordeBD  a,HttpSession session) {
+		Long idInformationsOperations=(Long) session.getAttribute("idInformationsOperations");
+		LignePretAccordeBD LignePretAccordeBD=ServiceLignePretAccorde.save(a, idInformationsOperations);
+		session.setAttribute("idInformationsPretsEmprunts",LignePretAccordeBD.getInformationsPretsEmprunts().getId());
+		return LignePretAccordeBD ;}
 
 	
 

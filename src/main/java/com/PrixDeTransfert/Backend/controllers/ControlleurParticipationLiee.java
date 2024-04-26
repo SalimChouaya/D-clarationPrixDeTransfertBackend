@@ -7,14 +7,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.PrixDeTransfert.Backend.models.LigneParticipationLieeBD;
+
+import jakarta.servlet.http.HttpSession;
 @RestController
 public class ControlleurParticipationLiee {
 
 	@Autowired
 	private com.PrixDeTransfert.Backend.services.ServiceParticipationLiee ServiceParticipationLiee ;
 	
-	@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/LigneParticipationLiee/{InformationsEntrepriseDeclarante-id}")
-	public LigneParticipationLieeBD save(@RequestBody LigneParticipationLieeBD a,@PathVariable("InformationsEntrepriseDeclarante-id") Long InformationsEntrepriseDeclaranteid) {
+	@PostMapping("/DéclarationPrixDeTransfert/InformationsEntrepriseDeclarante/LigneParticipationLiee")
+	
+	public LigneParticipationLieeBD save(@RequestBody LigneParticipationLieeBD a,HttpSession session) {
+		Long InformationsEntrepriseDeclaranteid=(Long) session.getAttribute("InformationsEntrepriseDeclaranteid");
 		return ServiceParticipationLiee.save(a, InformationsEntrepriseDeclaranteid);
 		
 	}

@@ -1,5 +1,6 @@
 package com.PrixDeTransfert.Backend.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,9 +18,9 @@ public class OperationsSansContrepartieOuAvecContrepartieNonMonetaireBD {
 	@OneToOne
     @JoinColumn(name = "Informations_Operations_id", referencedColumnName = "id")
     private InformationsOperationsBD InformationsOperations;
-	 @OneToOne(mappedBy = "OperationsSansContrepartieOuAvecContrepartieNonMonetaire")
+	 @OneToOne(mappedBy = "OperationsSansContrepartieOuAvecContrepartieNonMonetaire",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private  InformationsSurContrepartieNonMonetairePourBiensOuServicesBD InformationsSurContrepartieNonMonetairePourBiensOuServices;
-	 @OneToOne(mappedBy = "OperationsSansContrepartieOuAvecContrepartieNonMonetaire")
+	 @OneToOne(mappedBy = "OperationsSansContrepartieOuAvecContrepartieNonMonetaire",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private  InformationsSurBiensOuServicesSansContrePartieBD InformationsSurBiensOuServicesSansContrePartie;
 	public Long getId() {
 		return id;

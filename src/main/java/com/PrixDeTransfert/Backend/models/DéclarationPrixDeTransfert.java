@@ -1,5 +1,6 @@
 package com.PrixDeTransfert.Backend.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -118,13 +119,13 @@ public class DéclarationPrixDeTransfert {
 	public void setInformationsGroupeEntreprises(InformationsGroupeEntreprisesBD informationsGroupeEntreprises) {
 		InformationsGroupeEntreprises = informationsGroupeEntreprises;
 	}
-	@OneToOne(mappedBy = "DéclarationPrixDeTransfert")
+	@OneToOne(mappedBy = "DéclarationPrixDeTransfert" ,cascade = CascadeType.ALL, orphanRemoval = true)
     private InformationsEntrepriseDeclaranteBD InformationsEntrepriseDeclarante;
-    @OneToOne(mappedBy = "DéclarationPrixDeTransfert")
+    @OneToOne(mappedBy = "DéclarationPrixDeTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
     private InformationsGroupeEntreprisesBD InformationsGroupeEntreprises;
-    @OneToOne(mappedBy = "DéclarationPrixDeTransfert")
+    @OneToOne(mappedBy = "DéclarationPrixDeTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
     private InformationsOperationsBD InformationsOperations;
-    @OneToOne(mappedBy = "DéclarationPrixDeTransfert")
+    @OneToOne(mappedBy = "DéclarationPrixDeTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
     private AutresInformationsARenseignerSurDeclarationPrixTransfert AutresInformationsARenseignerSurDeclarationPrixTransfert;
 
 	public InformationsOperationsBD getInformationsOperations() {

@@ -76,7 +76,7 @@ public class InformationsServicesBD {
 	}
 
 
-	@OneToMany(mappedBy ="InformationsServices", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsServices",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneServiceBD> LigneService;
 	@OneToOne

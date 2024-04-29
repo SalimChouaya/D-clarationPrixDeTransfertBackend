@@ -11,6 +11,6 @@ import com.PrixDeTransfert.Backend.models.Entreprise;
 
 
 public interface InterfaceRepositoryCreerCompte extends JpaRepository<Entreprise, Long> {
-   
+    
     Entreprise findEntrepriseById( Long id);
 }

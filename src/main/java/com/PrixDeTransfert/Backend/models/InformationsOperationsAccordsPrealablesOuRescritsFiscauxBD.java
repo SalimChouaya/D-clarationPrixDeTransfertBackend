@@ -25,7 +25,7 @@ public class InformationsOperationsAccordsPrealablesOuRescritsFiscauxBD {
     private Long id;
 	@Column
 	char Affirmation;
-	@OneToMany(mappedBy ="InformationsOperationsAccordsPrealablesOuRescritsFiscaux", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsOperationsAccordsPrealablesOuRescritsFiscaux",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneOperationsAccordsPrealablesOuRescritsFiscauxBD> LigneOperationsAccordsPrealablesOuRescritsFiscaux;
 	

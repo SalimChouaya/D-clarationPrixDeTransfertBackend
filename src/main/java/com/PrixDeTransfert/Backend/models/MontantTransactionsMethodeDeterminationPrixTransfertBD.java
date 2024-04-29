@@ -21,20 +21,20 @@ public class MontantTransactionsMethodeDeterminationPrixTransfertBD {
 	 @Id
 	  @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Long id;
-	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert")
+	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsValeursExploitationBD InformationsValeursExploitation;
-	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert")
+	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsServicesBD InformationsServices;
-	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert")
+	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsOperationsFinancieresBD InformationsOperationsFinancieres;
-	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert")
+	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsCessionsAcquisitionsActifsBD InformationsCessionsAcquisitionsActifs;
-	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert")
+	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsAutresOperationsBD InformationsAutresOperations;
 
-	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert")
+	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsRemunerationsBiensCorporelsIncorporelsBD InformationsRemunerationsBiensCorporelsIncorporels;
-	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert")
+	 @OneToOne(mappedBy = "MontantTransactionsMethodeDeterminationPrixTransfert",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private DescriptionTransactionsRegimeFiscalPrivilegie DescriptionTransactionsRegimeFiscalPrivilegie;
 	    
 	    

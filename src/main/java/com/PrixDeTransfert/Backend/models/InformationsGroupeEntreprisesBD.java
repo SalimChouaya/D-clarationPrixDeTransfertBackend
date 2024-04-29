@@ -30,7 +30,7 @@ public class InformationsGroupeEntreprisesBD {
     @Column(name = "description_generale_politique_prix_transfert", length = 255)
     private String descriptionGeneralePolitiquePrixTransfert;
 
-    @OneToOne(mappedBy = "InformationsGroupeEntreprises")
+    @OneToOne(mappedBy = "InformationsGroupeEntreprises", cascade = CascadeType.ALL, orphanRemoval = true)
     private RestructurationsGroupeEntreprisesBD RestructurationsGroupeEntreprises;
 
     
@@ -44,7 +44,7 @@ public class InformationsGroupeEntreprisesBD {
 	@OneToOne
     @JoinColumn(name = "declaration_prix_de_transfert_id", referencedColumnName = "id")
     private DéclarationPrixDeTransfert DéclarationPrixDeTransfert;
-    @OneToOne(mappedBy = "InformationsGroupeEntreprises")
+    @OneToOne(mappedBy = "InformationsGroupeEntreprises" ,cascade = CascadeType.ALL, orphanRemoval = true)
     private InformationsMereEntiteUltimeBD InformationsMereEntiteUltime;
    
     
@@ -60,10 +60,10 @@ public class InformationsGroupeEntreprisesBD {
 	public void setLigneActifInCorporel(List<LigneActifInCorporelBD> ligneActifInCorporel) {
 		LigneActifInCorporel = ligneActifInCorporel;
 	}
-	@OneToMany(mappedBy ="InformationsGroupeEntreprises", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsGroupeEntreprises", cascade = CascadeType.ALL ,orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneActifCorporelBD> LigneActifCorporel;
-    @OneToMany(mappedBy ="InformationsGroupeEntreprises", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy ="InformationsGroupeEntreprises", cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneActifInCorporelBD> LigneActifInCorporel;
    

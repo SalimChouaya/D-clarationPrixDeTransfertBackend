@@ -1,11 +1,13 @@
 package com.PrixDeTransfert.Backend.controllers;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +50,7 @@ import com.PrixDeTransfert.Backend.models.ModificationLiensCapitalAuCoursExercic
 import com.PrixDeTransfert.Backend.models.MontantTransactionsMethodeDeterminationPrixTransfertBD;
 import com.PrixDeTransfert.Backend.models.OperationsSansContrepartieOuAvecContrepartieNonMonetaireBD;
 import com.PrixDeTransfert.Backend.models.Qualité;
+import com.PrixDeTransfert.Backend.models.User;
 import com.PrixDeTransfert.Backend.structureXML.GenerationXML.ActifIncorporel;
 import com.PrixDeTransfert.Backend.structureXML.GenerationXML.Actifcorporel;
 import com.PrixDeTransfert.Backend.structureXML.GenerationXML.AutreIdentifiant;
@@ -102,31 +105,47 @@ import com.PrixDeTransfert.Backend.structureXML.GenerationXML.PrixTransfert;
 import com.PrixDeTransfert.Backend.structureXML.GenerationXML.QualiteEntreprise;
 import com.PrixDeTransfert.Backend.structureXML.GenerationXML.QualiteEntrepriseDeclarante;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+
+import jakarta.servlet.http.HttpSession;
 @RestController
 public class ControlleurFichierXML {
+	
 	@Autowired
 	com.PrixDeTransfert.Backend.repositories.InterfaceRepositoryCreerCompte InterfaceRepositoryCreerCompte;
 	@Autowired
 	com.PrixDeTransfert.Backend.repositories.InterfaceRepositoryInformationsEntrepriseDeclarante InterfaceRepositoryInformationsEntrepriseDeclarante;
-
-	    @GetMapping("/download/xml/{idEntreprise}")
-	    public ResponseEntity<String> downloadXml(@PathVariable("idEntreprise") Long id) {
-	        try {
-	            com.PrixDeTransfert.Backend.structureXML.GenerationXML.PrixTransfert prixTransfert = createPrixTransfert(id); // Méthode à définir pour créer et remplir l'objet
-	            XmlMapper xmlMapper = new XmlMapper();
-	            xmlMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
-	            StringWriter writer = new StringWriter();
-	            xmlMapper.writeValue(writer, prixTransfert);
-	            
-	            String xmlContent = writer.toString();
-	            return ResponseEntity.ok()
-	                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"prix_transfert.xml\"")
-	                .contentType(MediaType.APPLICATION_XML)
-	                .body(xmlContent);
-	        } catch (Exception e) {
-	            return ResponseEntity.internalServerError().body("Error generating XML: " + e.getMessage());
-	        }
+	@Autowired
+	private com.PrixDeTransfert.Backend.repositories.InterfaceRepositoryUser InterfaceRepositoryUser ;
+	@GetMapping("/download/xml")
+    public ResponseEntity<String> downloadXml(  HttpSession session) {
+        try {
+        	Long id =(Long) session.getAttribute("iduser");
+        	User user=InterfaceRepositoryUser.findUserById(id);
+        	if(user.getEntreprise()==null) {
+        		
+        		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("vous n'avez pas une déclaration");
+        		
+        	}
+        	
+            com.PrixDeTransfert.Backend.structureXML.GenerationXML.PrixTransfert prixTransfert = createPrixTransfert(id); // Méthode à définir pour créer et remplir l'objet
+            XmlMapper xmlMapper = new XmlMapper();
+            xmlMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+            xmlMapper.setPropertyNamingStrategy(PropertyNamingStrategies.UPPER_CAMEL_CASE);
+            StringWriter writer = new StringWriter();
+            xmlMapper.writeValue(writer, prixTransfert);
+            
+            String xmlContent = writer.toString();
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"prix_transfert.xml\"")
+                .contentType(MediaType.APPLICATION_XML)
+                .body(xmlContent);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error generating XML: " + e.getMessage());
+        }
+    
 	    }
 
 	    private PrixTransfert createPrixTransfert(Long id) {
@@ -154,7 +173,7 @@ public class ControlleurFichierXML {
 	        ident.setCodePostal(Entreprise.getCodePostal());
 	        ident.setActivitePrincipale(Entreprise.getActivitePrincipale());
 	        ident.setActiviteSecondaire(Entreprise.getActiviteSecondaire());
-	        ident.setChiffreAffaireAnnuel(5000000.00);
+	        ident.setChiffreAffaireAnnuel(Entreprise.getChiffreAffaireAnnuel());
 
 	        prixTransfert.setIdentificationEntrepriseDeclarante(ident);
 	        
@@ -235,7 +254,7 @@ public class ControlleurFichierXML {
 		        	
 		        }
 		        else {
-		        	qualiteDeclarante.setAutreQualité(LigneParticipationDeclaranteBD.get(i).getQualitéEntreprise());
+		        	qualiteDeclarante.setAutreQualité(LigneParticipationDeclaranteBD.get(i).getAutreQualité());
 		        }
 	        LigneparticipationDeclarante.setQualiteEntreprise(qualiteDeclarante);
 	        LigneparticipationDeclarante.setPourcentageDetentionCapital(LigneParticipationDeclaranteBD.get(i).getPourcentageDetentionCapital());
@@ -303,12 +322,17 @@ public class ControlleurFichierXML {
 	        LigneActifIncorporel.setQualiteEntreprise(qualiteIncorporel);
 	        
 	        LigneActifIncorporel.setActifIncorporel(new ActifIncorporel());
-	        LigneActifIncorporel.getActifIncorporel().setNatureActifIncorporel(LigneActifIncorporelBD.get(i).getNatureActifIncorporel());
-	        LigneActifIncorporel.getActifIncorporel().setAutreNatureActifIncorporel(LigneActifIncorporelBD.get(i).getAutreNatureActifIncorporel());
+	        if(LigneActifIncorporelBD.get(i).getNatureActifIncorporel() != null && !LigneActifIncorporelBD.get(i).getNatureActifIncorporel().isEmpty()) {
+	        LigneActifIncorporel.getActifIncorporel().setNatureActifIncorporel(LigneActifIncorporelBD.get(i).getNatureActifIncorporel());}else {
+	        	LigneActifIncorporel.getActifIncorporel().setAutreNatureActifIncorporel(LigneActifIncorporelBD.get(i).getAutreNatureActifIncorporel());
+	        }
+	       
 	        LigneActifIncorporel.setOnereuxGratuit(LigneActifIncorporelBD.get(i).getOnreuxGratuit());
 	        LigneActifIncorporel.setNatureRelationEntreprise(new NatureRelationEntreprise());
-	        LigneActifIncorporel.getNatureRelationEntreprise().setAutreNatureRelation(LigneActifIncorporelBD.get(i).getAutreNatureRelation());
-	        LigneActifIncorporel.getNatureRelationEntreprise().setNatureRelation(LigneActifIncorporelBD.get(i).getNatureRelation());
+	        if (LigneActifIncorporelBD.get(i).getNatureRelation() !=null && !LigneActifIncorporelBD.get(i).getNatureRelation().isEmpty()){
+	        	LigneActifIncorporel.getNatureRelationEntreprise().setNatureRelation(LigneActifIncorporelBD.get(i).getNatureRelation());
+	        }else {
+	        LigneActifIncorporel.getNatureRelationEntreprise().setAutreNatureRelation(LigneActifIncorporelBD.get(i).getAutreNatureRelation());}
 	        ListeIncorporel.add(LigneActifIncorporel);
 	        }
 	       
@@ -341,12 +365,17 @@ public class ControlleurFichierXML {
 	        LigneActifCorporel.setQualiteEntreprise(qualitecorporel);
 	        
 	        LigneActifCorporel.setActifcorporel(new Actifcorporel());
-	        LigneActifCorporel.getActifcorporel().setNatureActifcorporel(LigneActifcorporelBD.get(i).getNatureActifcorporel());
-	        LigneActifCorporel.getActifcorporel().setAutreNatureActifcorporel(LigneActifcorporelBD.get(i).getAutreNatureActifcorporel());
+	        if(LigneActifcorporelBD.get(i).getNatureActifcorporel()!=null && !LigneActifcorporelBD.get(i).getNatureActifcorporel().isEmpty()) {
+	        LigneActifCorporel.getActifcorporel().setNatureActifcorporel(LigneActifcorporelBD.get(i).getNatureActifcorporel());}
+	        else {
+	        LigneActifCorporel.getActifcorporel().setAutreNatureActifcorporel(LigneActifcorporelBD.get(i).getAutreNatureActifcorporel());}
 	        
 	        LigneActifCorporel.setNatureRelationEntreprise(new NatureRelationEntreprise());
+	        if(LigneActifcorporelBD.get(i).getNatureRelation() != null && !LigneActifcorporelBD.get(i).getNatureRelation().isEmpty()) {
+	        	LigneActifCorporel.getNatureRelationEntreprise().setNatureRelation(LigneActifcorporelBD.get(i).getNatureRelation());
+	        }else {
 	        LigneActifCorporel.getNatureRelationEntreprise().setAutreNatureRelation(LigneActifcorporelBD.get(i).getAutreNatureRelation());
-	        LigneActifCorporel.getNatureRelationEntreprise().setNatureRelation(LigneActifcorporelBD.get(i).getNatureRelation());
+	        }
 	        Listecorporel.add(LigneActifCorporel);
 	        }
 	       
@@ -386,22 +415,34 @@ public class ControlleurFichierXML {
 		        }
 		        LigneValeurExploitation.setQualiteEntreprise(qualiteValeur);
 		        LigneValeurExploitation.setNatureOperationValeurExploitation(new NatureOperationValeurExploitation());
+		        if (LigneValeurExploitationBD.get(j).getNatureOperation()!=null && !LigneValeurExploitationBD.get(j).getNatureOperation().isEmpty()){
+		        LigneValeurExploitation.getNatureOperationValeurExploitation().setNatureOperation(LigneValeurExploitationBD.get(j).getNatureOperation());}
+		        else {
 		        LigneValeurExploitation.getNatureOperationValeurExploitation().setAutreNatureOperation(LigneValeurExploitationBD.get(j).getAutreNatureOperation());
-		        LigneValeurExploitation.getNatureOperationValeurExploitation().setNatureOperation(LigneValeurExploitationBD.get(j).getNatureOperation());
+		        }
 		        LigneValeurExploitation.setNatureRelationEntreprise(new NatureRelationEntreprise());
-		        LigneValeurExploitation.getNatureRelationEntreprise().setAutreNatureRelation(LigneValeurExploitationBD.get(j).getAutreNatureRelation());
-		        LigneValeurExploitation.getNatureRelationEntreprise().setNatureRelation(LigneValeurExploitationBD.get(j).getNatureRelation());
+		        if(LigneValeurExploitationBD.get(j).getNatureRelation()!=null && !LigneValeurExploitationBD.get(j).getNatureRelation().isEmpty()) {
+		        LigneValeurExploitation.getNatureRelationEntreprise().setNatureRelation(LigneValeurExploitationBD.get(j).getNatureRelation());}
+		        else {
+		        LigneValeurExploitation.getNatureRelationEntreprise().setAutreNatureRelation(LigneValeurExploitationBD.get(j).getAutreNatureRelation());}
+		        
 		        LigneValeurExploitation.setAchatsDepenses(LigneValeurExploitationBD.get(j).getAchatsDepenses());
 		        LigneValeurExploitation.setRaisonSociale(LigneValeurExploitationBD.get(j).getRaisonSociale());
 		        LigneValeurExploitation.setVentesRevenus(LigneValeurExploitationBD.get(j).getVentesRevenus());
 		        LigneValeurExploitation.setMethodePrixTransfert(new MethodePrixTransfert());
-		        LigneValeurExploitation.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneValeurExploitationBD.get(j).getAutreMethodeDeterminationPrixTransfert());
-		        LigneValeurExploitation.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert());
+		        if(LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert()!=null && !LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneValeurExploitation.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneValeurExploitation.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneValeurExploitationBD.get(j).getAutreMethodeDeterminationPrixTransfert());}
+		        
 		        LigneValeurExploitation.setChangementMethodePrixTransfert(new ChangementMethodePrixTransfert() );
+		        if(LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert()!=null && !LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneValeurExploitation.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert());}
+		        else {
 		        LigneValeurExploitation.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneValeurExploitationBD.get(j).getAutreMethodeDeterminationPrixTransfert());;
 		        
 		        
-		        LigneValeurExploitation.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneValeurExploitationBD.get(j).getMethodeDeterminationPrixTransfert());
+		        }
 		        
 		        ListeValeur.add(LigneValeurExploitation);
 	       }
@@ -441,22 +482,34 @@ public class ControlleurFichierXML {
 		        }
 		        LigneRemunerationBiens.setQualiteEntreprise(qualiteRemunerations);
 		        LigneRemunerationBiens.setNatureOperationRemunerationBiens(new NatureOperationRemunerationBiens());
-		        LigneRemunerationBiens.getNatureOperationRemunerationBiens().setAutreNatureOperation(LigneRemunerationBiensBD.get(k).getAutreNatureOperation());
-		        LigneRemunerationBiens.getNatureOperationRemunerationBiens().setNatureOperation(LigneRemunerationBiensBD.get(k).getNatureOperation());
+		        if(LigneRemunerationBiensBD.get(k).getNatureOperation()!=null && !LigneRemunerationBiensBD.get(k).getNatureOperation().isEmpty()) {
+		        LigneRemunerationBiens.getNatureOperationRemunerationBiens().setNatureOperation(LigneRemunerationBiensBD.get(k).getNatureOperation());}
+		        else {
+		        LigneRemunerationBiens.getNatureOperationRemunerationBiens().setAutreNatureOperation(LigneRemunerationBiensBD.get(k).getAutreNatureOperation());}
+		        
 		        LigneRemunerationBiens.setNatureRelationEntreprise(new NatureRelationEntreprise());
-		        LigneRemunerationBiens.getNatureRelationEntreprise().setAutreNatureRelation(LigneRemunerationBiensBD.get(k).getAutreNatureRelation());
-		        LigneRemunerationBiens.getNatureRelationEntreprise().setNatureRelation(LigneRemunerationBiensBD.get(k).getNatureRelation());
+		        if (LigneRemunerationBiensBD.get(k).getNatureRelation()!=null && !LigneRemunerationBiensBD.get(k).getNatureRelation().isEmpty()) {
+		        LigneRemunerationBiens.getNatureRelationEntreprise().setNatureRelation(LigneRemunerationBiensBD.get(k).getNatureRelation());}
+		        else {
+		        LigneRemunerationBiens.getNatureRelationEntreprise().setAutreNatureRelation(LigneRemunerationBiensBD.get(k).getAutreNatureRelation());}
+		        
 		        LigneRemunerationBiens.setAchatsDepenses(LigneRemunerationBiensBD.get(k).getAchatsDepenses());
 		        LigneRemunerationBiens.setRaisonSociale(LigneRemunerationBiensBD.get(k).getRaisonSociale());
 		        LigneRemunerationBiens.setVentesRevenus(LigneRemunerationBiensBD.get(k).getVentesRevenus());
 		        LigneRemunerationBiens.setMethodePrixTransfert(new MethodePrixTransfert());
-		        LigneRemunerationBiens.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getAutreMethodeDeterminationPrixTransfert());
-		        LigneRemunerationBiens.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert());
+		        if(LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert()!=null && !LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneRemunerationBiens.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneRemunerationBiens.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getAutreMethodeDeterminationPrixTransfert());}
+		       
 		        LigneRemunerationBiens.setChangementMethodePrixTransfert(new ChangementMethodePrixTransfert() );
-		        LigneRemunerationBiens.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getAutreMethodeDeterminationPrixTransfert());;
+		        if(LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert() !=null && !LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneRemunerationBiens.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneRemunerationBiens.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getAutreMethodeDeterminationPrixTransfert());}
 		        
 		        
-		        LigneRemunerationBiens.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneRemunerationBiensBD.get(k).getMethodeDeterminationPrixTransfert());
+		        
 		        
 		        ListeRemunerations.add(LigneRemunerationBiens);
 	       
@@ -499,22 +552,34 @@ public class ControlleurFichierXML {
 		        }
 		        LigneService.setQualiteEntreprise(qualiteService);
 		        LigneService.setNatureOperationService(new NatureOperationService());
-		        LigneService.getNatureOperationService().setAutreNatureOperation(LigneServiceBD.get(k).getAutreNatureOperation());
-		        LigneService.getNatureOperationService().setNatureOperation(LigneServiceBD.get(k).getNatureOperation());
+		        if(LigneServiceBD.get(k).getNatureOperation() !=null && !LigneServiceBD.get(k).getNatureOperation().isEmpty()) {
+		        LigneService.getNatureOperationService().setNatureOperation(LigneServiceBD.get(k).getNatureOperation());}
+		        else {
+		        LigneService.getNatureOperationService().setAutreNatureOperation(LigneServiceBD.get(k).getAutreNatureOperation());}
+		        
 		        LigneService.setNatureRelationEntreprise(new NatureRelationEntreprise());
-		        LigneService.getNatureRelationEntreprise().setAutreNatureRelation(LigneServiceBD.get(k).getAutreNatureRelation());
-		        LigneService.getNatureRelationEntreprise().setNatureRelation(LigneServiceBD.get(k).getNatureRelation());
+		        if(LigneServiceBD.get(k).getNatureRelation() !=null && !LigneServiceBD.get(k).getNatureRelation().isEmpty()) {
+		        LigneService.getNatureRelationEntreprise().setNatureRelation(LigneServiceBD.get(k).getNatureRelation());}
+		        else {
+		        LigneService.getNatureRelationEntreprise().setAutreNatureRelation(LigneServiceBD.get(k).getAutreNatureRelation());}
+		       
 		        LigneService.setAchatsDepenses(LigneServiceBD.get(k).getAchatsDepenses());
 		        LigneService.setRaisonSociale(LigneServiceBD.get(k).getRaisonSociale());
 		        LigneService.setVentesRevenus(LigneServiceBD.get(k).getVentesRevenus());
 		        LigneService.setMethodePrixTransfert(new MethodePrixTransfert());
-		        LigneService.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneServiceBD.get(k).getAutreMethodeDeterminationPrixTransfert());
-		        LigneService.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert());
+		        if(LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert() !=null && !LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneService.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneService.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneServiceBD.get(k).getAutreMethodeDeterminationPrixTransfert());}
+		        
 		        LigneService.setChangementMethodePrixTransfert(new ChangementMethodePrixTransfert() );
+		        if(LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert() !=null && !LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneService.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
 		        LigneService.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneServiceBD.get(k).getAutreMethodeDeterminationPrixTransfert());;
 		        
 		        
-		        LigneService.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneServiceBD.get(k).getMethodeDeterminationPrixTransfert());
+		        }
 		        
 	    	   ListeService.add(LigneService);
 	       }
@@ -555,22 +620,34 @@ public class ControlleurFichierXML {
 		        }
 		        LigneOperationFinanciere.setQualiteEntreprise(qualiteOperationF);
 		        LigneOperationFinanciere.setNatureOperationFinanciere(new NatureOperationFinanciere());
-		        LigneOperationFinanciere.getNatureOperationFinanciere().setAutreNatureOperation(LigneOperationFinanciereBD.get(k).getAutreNatureOperation());
-		        LigneOperationFinanciere.getNatureOperationFinanciere().setNatureOperation(LigneOperationFinanciereBD.get(k).getNatureOperation());
+		        if(LigneOperationFinanciereBD.get(k).getNatureOperation()!=null && !LigneOperationFinanciereBD.get(k).getNatureOperation().isEmpty()) {
+		        LigneOperationFinanciere.getNatureOperationFinanciere().setNatureOperation(LigneOperationFinanciereBD.get(k).getNatureOperation());}
+		        else {
+		        LigneOperationFinanciere.getNatureOperationFinanciere().setAutreNatureOperation(LigneOperationFinanciereBD.get(k).getAutreNatureOperation());}
+		        
 		        LigneOperationFinanciere.setNatureRelationEntreprise(new NatureRelationEntreprise());
-		        LigneOperationFinanciere.getNatureRelationEntreprise().setAutreNatureRelation(LigneOperationFinanciereBD.get(k).getAutreNatureRelation());
-		        LigneOperationFinanciere.getNatureRelationEntreprise().setNatureRelation(LigneOperationFinanciereBD.get(k).getNatureRelation());
+		        if(LigneOperationFinanciereBD.get(k).getNatureRelation()!=null && !LigneOperationFinanciereBD.get(k).getNatureRelation().isEmpty()) {
+		        LigneOperationFinanciere.getNatureRelationEntreprise().setNatureRelation(LigneOperationFinanciereBD.get(k).getNatureRelation());}
+		        else {
+		        LigneOperationFinanciere.getNatureRelationEntreprise().setAutreNatureRelation(LigneOperationFinanciereBD.get(k).getAutreNatureRelation());}
+		      
 		        LigneOperationFinanciere.setAchatsDepenses(LigneOperationFinanciereBD.get(k).getAchatsDepenses());
 		        LigneOperationFinanciere.setRaisonSociale(LigneOperationFinanciereBD.get(k).getRaisonSociale());
 		        LigneOperationFinanciere.setVentesRevenus(LigneOperationFinanciereBD.get(k).getVentesRevenus());
 		        LigneOperationFinanciere.setMethodePrixTransfert(new MethodePrixTransfert());
-		        LigneOperationFinanciere.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getAutreMethodeDeterminationPrixTransfert());
-		        LigneOperationFinanciere.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert());
+		        if(LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert()!=null && !LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneOperationFinanciere.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneOperationFinanciere.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getAutreMethodeDeterminationPrixTransfert());}
+		        
 		        LigneOperationFinanciere.setChangementMethodePrixTransfert(new ChangementMethodePrixTransfert() );
-		        LigneOperationFinanciere.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getAutreMethodeDeterminationPrixTransfert());;
+		        if(LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert()!=null && !LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneOperationFinanciere.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneOperationFinanciere.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getAutreMethodeDeterminationPrixTransfert());}
 		        
 		        
-		        LigneOperationFinanciere.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneOperationFinanciereBD.get(k).getMethodeDeterminationPrixTransfert());
+		        
 		        
 	    	   ListeOperationF.add(LigneOperationFinanciere);}
 	       
@@ -612,22 +689,34 @@ public class ControlleurFichierXML {
 		        }
 		        LigneCessionAcquisitionActif.setQualiteEntreprise(qualiteCession);
 		        LigneCessionAcquisitionActif.setNatureOperationCessionAcquisitionActif (new NatureOperationCessionAcquisitionActif ());
-		        LigneCessionAcquisitionActif.getNatureOperationCessionAcquisitionActif ().setAutreNatureOperation(LigneCessionAcquisitionActifBD.get(k).getAutreNatureOperation());
-		        LigneCessionAcquisitionActif.getNatureOperationCessionAcquisitionActif ().setNatureOperation(LigneCessionAcquisitionActifBD.get(k).getNatureOperation());
+		        if(LigneCessionAcquisitionActifBD.get(k).getNatureOperation()!=null && !LigneCessionAcquisitionActifBD.get(k).getNatureOperation().isEmpty()) {
+		        LigneCessionAcquisitionActif.getNatureOperationCessionAcquisitionActif ().setNatureOperation(LigneCessionAcquisitionActifBD.get(k).getNatureOperation());}
+		        else {
+		        LigneCessionAcquisitionActif.getNatureOperationCessionAcquisitionActif ().setAutreNatureOperation(LigneCessionAcquisitionActifBD.get(k).getAutreNatureOperation());}
+		        
 		        LigneCessionAcquisitionActif.setNatureRelationEntreprise(new NatureRelationEntreprise());
-		        LigneCessionAcquisitionActif.getNatureRelationEntreprise().setAutreNatureRelation(LigneCessionAcquisitionActifBD.get(k).getAutreNatureRelation());
-		        LigneCessionAcquisitionActif.getNatureRelationEntreprise().setNatureRelation(LigneOperationFinanciereBD.get(k).getNatureRelation());
+		        if( LigneCessionAcquisitionActifBD.get(k).getNatureRelation()!=null && ! LigneCessionAcquisitionActifBD.get(k).getNatureRelation().isEmpty()) {
+		        LigneCessionAcquisitionActif.getNatureRelationEntreprise().setNatureRelation( LigneCessionAcquisitionActifBD.get(k).getNatureRelation());}
+		        else {
+		        LigneCessionAcquisitionActif.getNatureRelationEntreprise().setAutreNatureRelation(LigneCessionAcquisitionActifBD.get(k).getAutreNatureRelation());}
+		        
 		        LigneCessionAcquisitionActif.setAchatsDepenses(LigneCessionAcquisitionActifBD.get(k).getAchatsDepenses());
 		        LigneCessionAcquisitionActif.setRaisonSociale(LigneCessionAcquisitionActifBD.get(k).getRaisonSociale());
 		        LigneCessionAcquisitionActif.setVentesRevenus(LigneCessionAcquisitionActifBD.get(k).getVentesRevenus());
 		        LigneCessionAcquisitionActif.setMethodePrixTransfert(new MethodePrixTransfert());
-		        LigneCessionAcquisitionActif.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getAutreMethodeDeterminationPrixTransfert());
-		        LigneCessionAcquisitionActif.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert());
+		        if(LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert()!=null && !LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneCessionAcquisitionActif.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneCessionAcquisitionActif.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getAutreMethodeDeterminationPrixTransfert());}
+		        
 		        LigneCessionAcquisitionActif.setChangementMethodePrixTransfert(new ChangementMethodePrixTransfert() );
-		        LigneCessionAcquisitionActif.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getAutreMethodeDeterminationPrixTransfert());;
+		        if(LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert()!=null && !LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneCessionAcquisitionActif.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
+		        LigneCessionAcquisitionActif.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getAutreMethodeDeterminationPrixTransfert());}
 		        
 		        
-		        LigneCessionAcquisitionActif.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneCessionAcquisitionActifBD.get(k).getMethodeDeterminationPrixTransfert());
+		        
 		        
 	    	   ListeCession.add(LigneCessionAcquisitionActif);}
 	       
@@ -669,22 +758,34 @@ public class ControlleurFichierXML {
 		        }
 		        LigneAutreOperation.setQualiteEntreprise(qualiteAutreOperation);
 		        LigneAutreOperation.setNatureAutreOperation (new NatureAutreOperation ());
-		        LigneAutreOperation.getNatureAutreOperation ().setAutreNatureOperation(LigneAutreOperationBD.get(k).getAutreNatureOperation());
-		        LigneAutreOperation.getNatureAutreOperation().setNatureOperation(LigneAutreOperationBD.get(k).getNatureOperation());
+		        if(LigneAutreOperationBD.get(k).getNatureOperation()!=null && !LigneAutreOperationBD.get(k).getNatureOperation().isEmpty()) {
+		        LigneAutreOperation.getNatureAutreOperation().setNatureOperation(LigneAutreOperationBD.get(k).getNatureOperation());}
+		        else {
+		        LigneAutreOperation.getNatureAutreOperation ().setAutreNatureOperation(LigneAutreOperationBD.get(k).getAutreNatureOperation());}
+		        
 		        LigneAutreOperation.setNatureRelationEntreprise(new NatureRelationEntreprise());
-		        LigneAutreOperation.getNatureRelationEntreprise().setAutreNatureRelation(LigneAutreOperationBD.get(k).getAutreNatureRelation());
-		        LigneAutreOperation.getNatureRelationEntreprise().setNatureRelation(LigneAutreOperationBD.get(k).getNatureRelation());
+		        if(LigneAutreOperationBD.get(k).getNatureRelation()!=null && !LigneAutreOperationBD.get(k).getNatureRelation().isEmpty()) {
+		        LigneAutreOperation.getNatureRelationEntreprise().setNatureRelation(LigneAutreOperationBD.get(k).getNatureRelation());}
+		        else {
+		        LigneAutreOperation.getNatureRelationEntreprise().setAutreNatureRelation(LigneAutreOperationBD.get(k).getAutreNatureRelation());}
+		       
 		        LigneAutreOperation.setAchatsDepenses(LigneAutreOperationBD.get(k).getAchatsDepenses());
 		        LigneAutreOperation.setRaisonSociale(LigneAutreOperationBD.get(k).getRaisonSociale());
 		        LigneAutreOperation.setVentesRevenus(LigneAutreOperationBD.get(k).getVentesRevenus());
 		        LigneAutreOperation.setMethodePrixTransfert(new MethodePrixTransfert());
+		        if(LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert()!=null && !LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneAutreOperation.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
 		        LigneAutreOperation.getMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneAutreOperationBD.get(k).getAutreMethodeDeterminationPrixTransfert());
-		        LigneAutreOperation.getMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert());
+		        }
 		        LigneAutreOperation.setChangementMethodePrixTransfert(new ChangementMethodePrixTransfert() );
+		        if(LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert()!=null && !LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert().isEmpty()) {
+		        LigneAutreOperation.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert());}
+		        else {
 		        LigneAutreOperation.getChangementMethodePrixTransfert().setAutreMethodeDeterminationPrixTransfert(LigneAutreOperationBD.get(k).getAutreMethodeDeterminationPrixTransfert());;
+		        }  
 		        
 		        
-		        LigneAutreOperation.getChangementMethodePrixTransfert().setMethodeDeterminationPrixTransfert(LigneAutreOperationBD.get(k).getMethodeDeterminationPrixTransfert());
 		        
 	    	   ListeAutreOperation.add(LigneAutreOperation);}
 	       
@@ -724,8 +825,11 @@ public class ControlleurFichierXML {
 	            LignePretAccorde.setMouvementsAugmentations(LignePretAccordeBD.get(k).getMouvementsAugmentations());
 	            LignePretAccorde.setMouvementsDiminutions(LignePretAccordeBD.get(k).getMouvementsDiminutions());
 	            LignePretAccorde.setNatureRelationEntreprise(new NatureRelationEntreprise());
-	            LignePretAccorde.getNatureRelationEntreprise().setAutreNatureRelation(LignePretAccordeBD.get(k).getAutreNatureRelation());
-	            LignePretAccorde.getNatureRelationEntreprise().setNatureRelation(LignePretAccordeBD.get(k).getNatureRelation());
+	            if(LignePretAccordeBD.get(k).getNatureRelation()!=null && !LignePretAccordeBD.get(k).getNatureRelation().isEmpty()) {
+	            LignePretAccorde.getNatureRelationEntreprise().setNatureRelation(LignePretAccordeBD.get(k).getNatureRelation());}
+	            else {
+	            LignePretAccorde.getNatureRelationEntreprise().setAutreNatureRelation(LignePretAccordeBD.get(k).getAutreNatureRelation());}
+	            
 	            LignePretAccorde.setPretsInterets(LignePretAccordeBD.get(k).getPretsInterets());
 	            LignePretAccorde.setRaisonSociale(LignePretAccordeBD.get(k).getRaisonSociale());
 	            LignePretAccorde.setSoldeCloture(LignePretAccordeBD.get(k).getSoldeCloture());
@@ -767,8 +871,11 @@ public class ControlleurFichierXML {
 		        LigneEmpruntContracte.setMouvementsAugmentations(LigneEmpruntContracteBD.get(k).getMouvementsAugmentations());
 		        LigneEmpruntContracte.setMouvementsDiminutions(LigneEmpruntContracteBD.get(k).getMouvementsDiminutions());
 		        LigneEmpruntContracte.setNatureRelationEntreprise(new NatureRelationEntreprise());
+		        if(LigneEmpruntContracteBD.get(k).getNatureRelation()!=null && !LigneEmpruntContracteBD.get(k).getNatureRelation().isEmpty()) {
+		        LigneEmpruntContracte.getNatureRelationEntreprise().setNatureRelation(LigneEmpruntContracteBD.get(k).getNatureRelation());}
+		        else {
 		        LigneEmpruntContracte.getNatureRelationEntreprise().setAutreNatureRelation(LigneEmpruntContracteBD.get(k).getAutreNatureRelation());
-		        LigneEmpruntContracte.getNatureRelationEntreprise().setNatureRelation(LigneEmpruntContracteBD.get(k).getNatureRelation());
+		        }
 		        
 		        LigneEmpruntContracte.setRaisonSociale(LigneEmpruntContracteBD.get(k).getRaisonSociale());
 		        LigneEmpruntContracte.setSoldeCloture(LigneEmpruntContracteBD.get(k).getSoldeCloture());
@@ -896,8 +1003,11 @@ public class ControlleurFichierXML {
 		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.setQualiteEntreprise(qualiteOperationsAccords);
 		        
 		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.setNatureRelationEntreprise(new NatureRelationEntreprise());
-		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.getNatureRelationEntreprise().setAutreNatureRelation(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getAutreNatureOperation());
-		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.getNatureRelationEntreprise().setNatureRelation(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getNatureRelation());
+		        if(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getNatureRelation()!=null && !LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getNatureRelation().isEmpty()) {
+		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.getNatureRelationEntreprise().setNatureRelation(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getNatureRelation());}
+		        else {
+		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.getNatureRelationEntreprise().setAutreNatureRelation(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getAutreNatureOperation());}
+		        
 		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.setExerciceDebut(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getExerciceDebut());
 		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.setExerciceFin(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getExerciceFin());
 		        LigneOperationsAccordsPrealablesOuRescritsFiscaux.setRaisonSociale(LigneOperationsAccordsPrealablesOuRescritsFiscauxBD.get(k).getRaisonSociale());

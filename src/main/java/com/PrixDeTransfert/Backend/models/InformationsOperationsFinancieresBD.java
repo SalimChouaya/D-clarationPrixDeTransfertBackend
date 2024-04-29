@@ -56,7 +56,7 @@ public class InformationsOperationsFinancieresBD {
 			MontantTransactionsMethodeDeterminationPrixTransfertBD montantTransactionsMethodeDeterminationPrixTransfert) {
 		MontantTransactionsMethodeDeterminationPrixTransfert = montantTransactionsMethodeDeterminationPrixTransfert;
 	}
-	@OneToMany(mappedBy ="InformationsOperationsFinancieres", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsOperationsFinancieres",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneOperationFinanciereBD> LigneOperationFinanciere;
 	@OneToOne

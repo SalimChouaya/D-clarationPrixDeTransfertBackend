@@ -32,10 +32,9 @@ public class InformationsEntrepriseDeclaranteBD {
 	 @Column(name="description_activites_principales", length = 255)
 	private String DescriptionActivitesPrincipales;
 	
-	 @Column(name="description_changements_activite_aucours_exercice", length = 255)
-	private String DescriptionChangementsActiviteAucoursExercice;
 	 
-	 @OneToMany(mappedBy ="InformationsEntrepriseDeclarante", cascade = CascadeType.ALL)
+	 
+	 @OneToMany(mappedBy ="InformationsEntrepriseDeclarante",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<Qualité> Qualité;
 	 
@@ -43,16 +42,16 @@ public class InformationsEntrepriseDeclaranteBD {
 	    @JoinColumn(name ="declaration_prix_de_transfert_id", referencedColumnName = "id")
 	    private DéclarationPrixDeTransfert DéclarationPrixDeTransfert;
 	 
-	 @OneToOne(mappedBy = "InformationsEntrepriseDeclarante")
+	 @OneToOne(mappedBy = "InformationsEntrepriseDeclarante",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private ModificationLiensCapitalAuCoursExerciceBD ModificationLiensCapitalAuCoursExercice;
-	 @OneToOne(mappedBy = "InformationsEntrepriseDeclarante")
+	 @OneToOne(mappedBy = "InformationsEntrepriseDeclarante",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private ChangementsActiviteAucoursExerciceBD ChangementsActiviteAucoursExercice;
 	 
-	 @OneToMany(mappedBy ="InformationsEntrepriseDeclarante", cascade = CascadeType.ALL)
+	 @OneToMany(mappedBy ="InformationsEntrepriseDeclarante",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneParticipationLieeBD> ligneParticipationLiee;
 
-	    @OneToMany(mappedBy ="InformationsEntrepriseDeclarante", cascade = CascadeType.ALL)
+	    @OneToMany(mappedBy ="InformationsEntrepriseDeclarante",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private List<LigneParticipationDeclaranteBD> ligneParticipationDeclarante;
 
 		public Long getId() {
@@ -81,13 +80,7 @@ public class InformationsEntrepriseDeclaranteBD {
 
 		
 
-		public String getDescriptionChangementsActiviteAucoursExercice() {
-			return DescriptionChangementsActiviteAucoursExercice;
-		}
-
-		public void setDescriptionChangementsActiviteAucoursExercice(String descriptionChangementsActiviteAucoursExercice) {
-			DescriptionChangementsActiviteAucoursExercice = descriptionChangementsActiviteAucoursExercice;
-		}
+		
 
 		public List<Qualité> getQualité() {
 			return Qualité;

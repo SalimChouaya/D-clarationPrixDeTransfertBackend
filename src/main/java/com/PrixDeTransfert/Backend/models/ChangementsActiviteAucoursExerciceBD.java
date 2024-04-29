@@ -17,7 +17,7 @@ public class ChangementsActiviteAucoursExerciceBD {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 	@Column
-	char Affirmation;
+	String Affirmation;
 	@Column 
 	String Description;
 	@OneToOne
@@ -29,10 +29,10 @@ public class ChangementsActiviteAucoursExerciceBD {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public char getAffirmation() {
+	public String getAffirmation() {
 		return Affirmation;
 	}
-	public void setAffirmation(char affirmation) {
+	public void setAffirmation(String affirmation) {
 		Affirmation = affirmation;
 	}
 	public String getDescription() {

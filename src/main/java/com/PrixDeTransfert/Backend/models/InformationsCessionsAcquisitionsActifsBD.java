@@ -31,7 +31,7 @@ public class InformationsCessionsAcquisitionsActifsBD {
 	@OneToOne
     @JoinColumn(name = "MontantTransactionsMethodeDeterminationPrixTransfertid", referencedColumnName = "id")
     private MontantTransactionsMethodeDeterminationPrixTransfertBD MontantTransactionsMethodeDeterminationPrixTransfert;
-	@OneToMany(mappedBy ="InformationsCessionsAcquisitionsActifs", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsCessionsAcquisitionsActifs", cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneCessionAcquisitionActifBD> LigneCessionAcquisitionActif;
 	public Long getId() {

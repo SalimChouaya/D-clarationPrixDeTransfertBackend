@@ -32,7 +32,7 @@ public class InformationsRemunerationsBiensCorporelsIncorporelsBD {
 		public void setId(Long id) {
 			this.id = id;
 		}
-		@OneToMany(mappedBy ="InformationsRemunerationsBiensCorporelsIncorporels", cascade = CascadeType.ALL)
+		@OneToMany(mappedBy ="InformationsRemunerationsBiensCorporelsIncorporels",cascade = CascadeType.ALL, orphanRemoval = true)
 		 @JsonManagedReference
 		    private List<LigneRemunerationBiensBD> LigneRemunerationBiens;
 		

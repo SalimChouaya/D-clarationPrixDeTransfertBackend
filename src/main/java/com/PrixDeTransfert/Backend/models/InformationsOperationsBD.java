@@ -1,5 +1,6 @@
 package com.PrixDeTransfert.Backend.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,13 +20,13 @@ public class InformationsOperationsBD {
 	 @OneToOne
 	    @JoinColumn(name = "declaration_prix_de_transfert_id", referencedColumnName = "id")
 	    private DéclarationPrixDeTransfert DéclarationPrixDeTransfert;
-	 @OneToOne(mappedBy = "InformationsOperations")
+	 @OneToOne(mappedBy = "InformationsOperations",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private MontantTransactionsMethodeDeterminationPrixTransfertBD MontantTransactionsMethodeDeterminationPrixTransfert;
-	 @OneToOne(mappedBy = "InformationsOperations")
+	 @OneToOne(mappedBy = "InformationsOperations",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsPretsEmpruntsBD InformationsPretsEmprunts;
-	 @OneToOne(mappedBy = "InformationsOperations")
+	 @OneToOne(mappedBy = "InformationsOperations",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private OperationsSansContrepartieOuAvecContrepartieNonMonetaireBD OperationsSansContrepartieOuAvecContrepartieNonMonetaire;
-	 @OneToOne(mappedBy = "InformationsOperations")
+	 @OneToOne(mappedBy = "InformationsOperations",cascade = CascadeType.ALL, orphanRemoval = true)
 	    private InformationsOperationsAccordsPrealablesOuRescritsFiscauxBD InformationsOperationsAccordsPrealablesOuRescritsFiscaux;
 	public Long getId() {
 		return id;

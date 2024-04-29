@@ -26,7 +26,7 @@ public class InformationsSurContrepartieNonMonetairePourBiensOuServicesBD {
 	@OneToOne
     @JoinColumn(name = "OperationsSCPOACPNM", referencedColumnName = "id")
     private OperationsSansContrepartieOuAvecContrepartieNonMonetaireBD OperationsSansContrepartieOuAvecContrepartieNonMonetaire;
-	@OneToMany(mappedBy ="InformationsSurContrepartieNonMonetairePourBiensOuServices", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsSurContrepartieNonMonetairePourBiensOuServices",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneContrepartieNonMonetairePourBiensOuServicesBD> LigneContrepartieNonMonetairePourBiensOuServices;
 	public Long getId() {

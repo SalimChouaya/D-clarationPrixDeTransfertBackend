@@ -54,7 +54,7 @@ public class InformationsAutresOperationsBD {
 	@OneToOne
     @JoinColumn(name = "MontantTransactionsMethodeDeterminationPrixTransfertid", referencedColumnName = "id")
     private MontantTransactionsMethodeDeterminationPrixTransfertBD MontantTransactionsMethodeDeterminationPrixTransfert;
-	@OneToMany(mappedBy ="InformationsAutresOperations", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsAutresOperations", cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneAutreOperationBD> LigneAutreOperation;
 	public List<LigneAutreOperationBD> getLigneAutreOperation() {

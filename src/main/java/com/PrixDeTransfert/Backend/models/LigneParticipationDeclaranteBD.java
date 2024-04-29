@@ -73,22 +73,17 @@ public class LigneParticipationDeclaranteBD {
 		public void setRaisonSociale(String raisonSociale) {
 			RaisonSociale = raisonSociale;
 		}
-		public String getQualitéEntreprise() {
-			return QualitéEntreprise;
-		}
-		public void setQualitéEntreprise(String qualitéEntreprise) {
-			QualitéEntreprise = qualitéEntreprise;
-		}
-		public double getPourcentageDetentionCapital() {
+		
+		public String getPourcentageDetentionCapital() {
 			return PourcentageDetentionCapital;
 		}
-		public void setPourcentageDetentionCapital(double pourcentageDetentionCapital) {
+		public void setPourcentageDetentionCapital(String pourcentageDetentionCapital) {
 			PourcentageDetentionCapital = pourcentageDetentionCapital;
 		}
-		public double getPourcentageDetentionDroitsVote() {
+		public String getPourcentageDetentionDroitsVote() {
 			return PourcentageDetentionDroitsVote;
 		}
-		public void setPourcentageDetentionDroitsVote(double pourcentageDetentionDroitsVote) {
+		public void setPourcentageDetentionDroitsVote(String pourcentageDetentionDroitsVote) {
 			PourcentageDetentionDroitsVote = pourcentageDetentionDroitsVote;
 		}
 		public InformationsEntrepriseDeclaranteBD getInformationsEntrepriseDeclarante() {
@@ -100,14 +95,13 @@ public class LigneParticipationDeclaranteBD {
 		@Column(name = "raison_sociale")
 	    private String RaisonSociale;
 
-	    @Column(name = "qualite_entreprise")
-	    private String QualitéEntreprise;
+	    
 
 	    @Column(name = "pourcentage_detention_capital")
-	    private double PourcentageDetentionCapital;
+	    private String PourcentageDetentionCapital;
 
 	    @Column(name = "pourcentage_detention_droits_vote")
-	    private double PourcentageDetentionDroitsVote;
+	    private String PourcentageDetentionDroitsVote;
 	    @ManyToOne
 	    @JoinColumn(name = "informations_entreprise_declarante_id", referencedColumnName = "id")
 	    private InformationsEntrepriseDeclaranteBD InformationsEntrepriseDeclarante;

@@ -22,10 +22,10 @@ public class InformationsPretsEmpruntsBD {
 	@OneToOne
     @JoinColumn(name = "Informations_Operations_id", referencedColumnName = "id")
     private InformationsOperationsBD InformationsOperations;
-	@OneToMany(mappedBy ="InformationsPretsEmprunts", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsPretsEmprunts",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LignePretAccordeBD> LignePretAccorde;
-	@OneToMany(mappedBy ="InformationsPretsEmprunts", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy ="InformationsPretsEmprunts",cascade = CascadeType.ALL, orphanRemoval = true)
 	 @JsonManagedReference
 	    private List<LigneEmpruntContracteBD> LigneEmpruntContracte;
 	public Long getId() {

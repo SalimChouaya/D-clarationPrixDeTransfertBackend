@@ -18,8 +18,8 @@ public class GenerationXML {
         @JacksonXmlProperty(isAttribute = true, localName = "VersionDocument")
         private String versionDocument = "1.0";
 
-        @JacksonXmlProperty(isAttribute = true, localName = "xsi:noNamespaceSchemaLocation", namespace = "http://www.w3.org/2001/XMLSchema-instance")
-        private String schemaLocation = "FDPT.xsd";
+        @JacksonXmlProperty(isAttribute = true, localName = "noNamespaceSchemaLocation", namespace = "http://www.w3.org/2001/XMLSchema-instance")
+        private String schemaLocation = "classpath:/static/FDPT.xsd";
         
         private Entete entete;
         private IdentificationEntrepriseDeclarante identificationEntrepriseDeclarante;
@@ -174,7 +174,7 @@ public class GenerationXML {
         private String codePostal;
         private String activitePrincipale;
         private String activiteSecondaire;
-        private double chiffreAffaireAnnuel;
+        private String chiffreAffaireAnnuel;
 		public String getRaisonSociale() {
 			return raisonSociale;
 		}
@@ -217,11 +217,11 @@ public class GenerationXML {
 		public void setActiviteSecondaire(String activiteSecondaire) {
 			this.activiteSecondaire = activiteSecondaire;
 		}
-		public double getChiffreAffaireAnnuel() {
+		public String getChiffreAffaireAnnuel() {
 			return chiffreAffaireAnnuel;
 		}
-		public void setChiffreAffaireAnnuel(double chiffreAffaireAnnuel) {
-			this.chiffreAffaireAnnuel = chiffreAffaireAnnuel;
+		public void setChiffreAffaireAnnuel(String string) {
+			this.chiffreAffaireAnnuel = string;
 		}
 
         
@@ -287,13 +287,13 @@ public class GenerationXML {
     }
 
     public static class ChangementsActiviteAuCoursExercice {
-        private char affirmation;
+        private String affirmation;
         private String description;
-		public char getAffirmation() {
+		public String getAffirmation() {
 			return affirmation;
 		}
-		public void setAffirmation(char affirmation) {
-			this.affirmation = affirmation;
+		public void setAffirmation(String string) {
+			this.affirmation = string;
 		}
 		public String getDescription() {
 			return description;
@@ -341,8 +341,8 @@ public class GenerationXML {
         private IdentifiantEntreprise identifiantEntreprise;
         private String raisonSociale;
         private QualiteEntreprise qualiteEntreprise;
-        private double pourcentageDetentionCapital;
-        private double pourcentageDetentionDroitsVote;
+        private String pourcentageDetentionCapital;
+        private String pourcentageDetentionDroitsVote;
 		public IdentifiantEntreprise getIdentifiantEntreprise() {
 			return identifiantEntreprise;
 		}
@@ -361,16 +361,16 @@ public class GenerationXML {
 		public void setQualiteEntreprise(QualiteEntreprise qualiteEntreprise) {
 			this.qualiteEntreprise = qualiteEntreprise;
 		}
-		public double getPourcentageDetentionCapital() {
+		public String getPourcentageDetentionCapital() {
 			return pourcentageDetentionCapital;
 		}
-		public void setPourcentageDetentionCapital(double pourcentageDetentionCapital) {
+		public void setPourcentageDetentionCapital(String pourcentageDetentionCapital) {
 			this.pourcentageDetentionCapital = pourcentageDetentionCapital;
 		}
-		public double getPourcentageDetentionDroitsVote() {
+		public String getPourcentageDetentionDroitsVote() {
 			return pourcentageDetentionDroitsVote;
 		}
-		public void setPourcentageDetentionDroitsVote(double pourcentageDetentionDroitsVote) {
+		public void setPourcentageDetentionDroitsVote(String pourcentageDetentionDroitsVote) {
 			this.pourcentageDetentionDroitsVote = pourcentageDetentionDroitsVote;
 		}
 
@@ -381,8 +381,8 @@ public class GenerationXML {
         private IdentifiantEntreprise identifiantEntreprise;
         private String raisonSociale;
         private QualiteEntreprise qualiteEntreprise;
-        private double pourcentageDetentionCapital;
-        private double pourcentageDetentionDroitsVote;
+        private String pourcentageDetentionCapital;
+        private String pourcentageDetentionDroitsVote;
 		public IdentifiantEntreprise getIdentifiantEntreprise() {
 			return identifiantEntreprise;
 		}
@@ -401,16 +401,16 @@ public class GenerationXML {
 		public void setQualiteEntreprise(QualiteEntreprise qualiteEntreprise) {
 			this.qualiteEntreprise = qualiteEntreprise;
 		}
-		public double getPourcentageDetentionCapital() {
+		public String getPourcentageDetentionCapital() {
 			return pourcentageDetentionCapital;
 		}
-		public void setPourcentageDetentionCapital(double pourcentageDetentionCapital) {
+		public void setPourcentageDetentionCapital(String pourcentageDetentionCapital) {
 			this.pourcentageDetentionCapital = pourcentageDetentionCapital;
 		}
-		public double getPourcentageDetentionDroitsVote() {
+		public String getPourcentageDetentionDroitsVote() {
 			return pourcentageDetentionDroitsVote;
 		}
-		public void setPourcentageDetentionDroitsVote(double pourcentageDetentionDroitsVote) {
+		public void setPourcentageDetentionDroitsVote(String pourcentageDetentionDroitsVote) {
 			this.pourcentageDetentionDroitsVote = pourcentageDetentionDroitsVote;
 		}
 

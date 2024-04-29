@@ -2,11 +2,13 @@ package com.PrixDeTransfert.Backend.models;
 
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 @Entity
@@ -57,10 +59,22 @@ public class Entreprise {
     
     @Column(name = "chiffre_affaire_annuel") // Nom de la colonne
     private String chiffreAffaireAnnuel;
-    @OneToOne(mappedBy = "entreprise")
+    @OneToOne(mappedBy = "entreprise" ,cascade = CascadeType.ALL, orphanRemoval = true)
     private DéclarationPrixDeTransfert DéclarationPrixDeTransfert;
+     
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User User;
 
 	
+
+	public User getUser() {
+		return User;
+	}
+
+	public void setUser(User user) {
+		User = user;
+	}
 
 	public String getRaisonSocial() {
 		return raisonSocial;

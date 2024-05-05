@@ -1,12 +1,19 @@
 package com.PrixDeTransfert.Backend.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.PrixDeTransfert.Backend.models.DéclarationPrixDeTransfert;
+import com.PrixDeTransfert.Backend.models.InformationsOperationsBD;
 import com.PrixDeTransfert.Backend.models.InformationsSurContrepartieNonMonetairePourBiensOuServicesBD;
+import com.PrixDeTransfert.Backend.models.LigneEmpruntContracteBD;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -21,5 +28,31 @@ public class ControllerInformationsSurContrepartieNonMonetairePourBiensOuService
 		InformationsSurContrepartieNonMonetairePourBiensOuServicesBD InformationsSurContrepartieNonMonetairePourBiensOuServicesBD=ServiceInformationsSurContrepartieNonMonetairePourBiensOuServices.save(a, IdOperationsSansContrepartieOuAvecContrepartieNonMonetaire);
 		session.setAttribute("idInformationsSurContrepartieNonMonetairePourBiensOuServices", InformationsSurContrepartieNonMonetairePourBiensOuServicesBD.getId());
 		return InformationsSurContrepartieNonMonetairePourBiensOuServicesBD ;}
-
+@Autowired
+com.PrixDeTransfert.Backend.repositories.InterfaceRepositoryInformationsSurContrepartieNonMonetairePourBiensOuServices InterfaceRepositoryInformationsSurContrepartieNonMonetairePourBiensOuServices;
+	@Autowired
+	com.PrixDeTransfert.Backend.repositories.InterfaceRepositoryDéclarationPrixDeTransfert InterfaceRepositoryDéclarationPrixDeTransfert;
+		@PutMapping("/MiseAjourInformationsSurContrepartieNonMonetairePourBiensOuServices")
+		public ResponseEntity<String> updateInformationsSurContrepartieNonMonetairePourBiensOuServices(@RequestBody InformationsSurContrepartieNonMonetairePourBiensOuServicesBD updatedInformationsSurContrepartieNonMonetairePourBiensOuServices,HttpSession session) {
+		
+			Long iddeclaration =(Long) session.getAttribute("Déclarationid");
+			DéclarationPrixDeTransfert DéclarationPrixDeTransfert =InterfaceRepositoryDéclarationPrixDeTransfert.findDéclarationPrixDeTransfertById(iddeclaration);
+			InformationsOperationsBD InformationsOperations=DéclarationPrixDeTransfert.getInformationsOperations();
+			
+			InformationsSurContrepartieNonMonetairePourBiensOuServicesBD InformationsSurContrepartieNonMonetairePourBiensOuServices=InformationsOperations.getOperationsSansContrepartieOuAvecContrepartieNonMonetaire().getInformationsSurContrepartieNonMonetairePourBiensOuServices();
+			
+			InformationsSurContrepartieNonMonetairePourBiensOuServices.setAffirmation(updatedInformationsSurContrepartieNonMonetairePourBiensOuServices.getAffirmation());
+			
+			InterfaceRepositoryInformationsSurContrepartieNonMonetairePourBiensOuServices.save(InformationsSurContrepartieNonMonetairePourBiensOuServices);
+			session.setAttribute("idInformationsSurContrepartieNonMonetairePourBiensOuServices", InformationsSurContrepartieNonMonetairePourBiensOuServices.getId());
+			return ResponseEntity.ok(" mise à jour avec succès");
+	
+	
+	
+	
+	
+	
+	
+	
+}
 }

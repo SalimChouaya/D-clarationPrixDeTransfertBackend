@@ -24,6 +24,17 @@ public class ControllerCreerCompteEntreprise {
 	private com.PrixDeTransfert.Backend.repositories.InterfaceRepositoryUser InterfaceRepositoryUser ;
 	@Autowired
 	InterfaceRepositoryCreerCompte InterfaceRepositoryCreerCompte;
+	
+	@GetMapping("/getDéclaration")
+	public Entreprise GetDéclarationComplete(HttpSession session) {
+		Long iduser=(Long)session.getAttribute("iduser");
+		
+		User user = InterfaceRepositoryUser.findUserById(iduser);
+		
+	    Entreprise existingEntreprise = InterfaceRepositoryCreerCompte.findEntrepriseById(user.getEntreprise().getId());
+	    return existingEntreprise ;
+		
+	}
 	@PostMapping("/Entreprise")// le controlleur pour faire la declaration 
 	public Object save(@RequestBody com.PrixDeTransfert.Backend.models.Entreprise a, HttpSession session) {
 		Long iduser =(Long) session.getAttribute("iduser");

@@ -33,7 +33,7 @@ public class LigneBiensOuServicesSansContrePartieBD {
 	@Column
 	String NatureRelation ;
 	@Column
-	String AutreNatureOperation;
+	String AutreNatureRelation;
 	@Column
 	String NatureBiensOuService ;
 	@Column
@@ -85,11 +85,12 @@ public class LigneBiensOuServicesSansContrePartieBD {
 	public void setNatureRelation(String natureRelation) {
 		NatureRelation = natureRelation;
 	}
-	public String getAutreNatureOperation() {
-		return AutreNatureOperation;
+	
+	public String getAutreNatureRelation() {
+		return AutreNatureRelation;
 	}
-	public void setAutreNatureOperation(String autreNatureOperation) {
-		AutreNatureOperation = autreNatureOperation;
+	public void setAutreNatureRelation(String autreNatureRelation) {
+		AutreNatureRelation = autreNatureRelation;
 	}
 	public String getRaisonSociale() {
 		return RaisonSociale;
